@@ -1,17 +1,43 @@
-import express from 'express'
-import restUserRouter from './rest/routes'
+import express from "express";
+import cors from "cors";
+import restUserRouter from "./REST/routes";
 
-const app = express()
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
 
-app.use(express.json())
-app.use(express.urlencoded({extended:true}))
+import { typeDefs } from "./GraphQL/schema";
+import { resolvers } from "./GraphQL/resolvers";
 
-app.use('/rest',restUserRouter)
+const app = express();
 
-app.get('/health',(req,res)=>{
-    res.json({status:'ok',message:"server is running"})
-})
+// ✅ ORDER MATTERS
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.listen(3000,()=>{
-    console.log('server running')
-})
+app.use("/rest", restUserRouter);
+
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", message: "server is running" });
+});
+
+const startServer = async () => {
+  const apolloServer = new ApolloServer({
+    typeDefs,
+    resolvers,
+  });
+
+  await apolloServer.start();
+
+app.use(
+  '/graphql',
+  express.json(),                 // 🔥 attach parser HERE
+  expressMiddleware(apolloServer)
+);
+  app.listen(3000, () => {
+    console.log("REST: http://localhost:3000/rest");
+    console.log("GraphQL: http://localhost:3000/graphql");
+  });
+};
+
+startServer();
