@@ -1,5 +1,5 @@
 import express from 'express'
-import restUserRouter from './rest/routes'
+import restUserRouter from './REST/routes'
 
 const app = express()
 
