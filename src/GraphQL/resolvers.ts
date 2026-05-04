@@ -1,10 +1,7 @@
 import { randomUUID } from "crypto";
+import { User, users } from "../data/users";
 
 const uuid = randomUUID()
-const users = [
-    { id: uuid, name: "Rashid Narikkodan", email: "rashidnarikkodan20@gmail.com" },
-];
-
 
 export const resolvers = {
   Query: {
@@ -12,7 +9,7 @@ export const resolvers = {
         return users
     },
     user:(_: any, args: { id: string })=>{
-        return users.find((user)=>user.id == args.id)
+        return users.find((user:User)=>user.id == args.id)
     }
 },
 Mutation: {
