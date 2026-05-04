@@ -7,10 +7,11 @@ import { expressMiddleware } from "@apollo/server/express4";
 
 import { typeDefs } from "./GraphQL/schema";
 import { resolvers } from "./GraphQL/resolvers";
+import { createServer } from "http";
+import { initWebSocket } from "./WebSocket/socket";
 
 const app = express();
 
-// ✅ ORDER MATTERS
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -29,14 +30,22 @@ const startServer = async () => {
 
   await apolloServer.start();
 
-app.use(
-  '/graphql',
-  express.json(),                 // 🔥 attach parser HERE
-  expressMiddleware(apolloServer)
-);
-  app.listen(3000, () => {
+  app.use(
+    "/graphql",
+    express.json(),
+    expressMiddleware(apolloServer)
+  );
+
+  const server = createServer(app);
+
+  // ✅ attach WS to same server
+  initWebSocket(server);
+
+  // ✅ start THIS server (not app.listen)
+  server.listen(3000, () => {
     console.log("REST: http://localhost:3000/rest");
     console.log("GraphQL: http://localhost:3000/graphql");
+    console.log("WebSocket: ws://localhost:3000");
   });
 };
 
