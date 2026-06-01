@@ -1,7 +1,6 @@
 import { randomUUID } from "crypto";
 import { User, users } from "../data/users";
 
-const uuid = randomUUID()
 
 export const resolvers = {
   Query: {
